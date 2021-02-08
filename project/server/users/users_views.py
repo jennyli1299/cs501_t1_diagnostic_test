@@ -15,6 +15,9 @@ class UsersAPI(MethodView):
 
     def get(self):
     	users = db.session.query(User.email).all()
+    	users = [u[0] for u in users]
+    	for u in users:
+            print(u)
 
     	responseObject = {
     		'status': 'success',
