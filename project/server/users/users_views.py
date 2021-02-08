@@ -1,4 +1,4 @@
-# project/server/auth/views.py
+# project/server/users/users_views.py
 
 from flask import Blueprint, request, make_response, jsonify
 from flask.views import MethodView
@@ -6,17 +6,20 @@ from flask.views import MethodView
 from project.server import bcrypt, db
 from project.server.models import User
 
-auth_blueprint = Blueprint('auth', __name__)
+users_blueprint = Blueprint('users', __name__)
 
-class RegisterAPI(MethodView):
+class UsersAPI(MethodView):
     """
-    User Registration Resource
+    List / Index of Users Resource
     """
 
     def get(self):
+    	users = db.session.query(User.email).all()
+
     	responseObject = {
     		'status': 'success',
-    		'message': 'Request successful but please send an HTTP POST request to register the user.'
+    		'message': 'List of registered users\' emails',
+            'User emails': str(users)
     	}
     	return make_response(jsonify(responseObject)), 201
 
@@ -24,7 +27,7 @@ class RegisterAPI(MethodView):
         # get the post data
         post_data = request.get_json(force=True); print(request)
         # check if user already exists
-        user = User.query.filter_by(email=post_data.get('email')).first()
+        user = User.query()
         if not user:
             try:
                 user = User(
@@ -58,11 +61,11 @@ class RegisterAPI(MethodView):
 
 
 # define the API resources
-registration_view = RegisterAPI.as_view('register_api')
+users_view = UsersAPI.as_view('users_api')
 
 # add Rules for API Endpoints
-auth_blueprint.add_url_rule(
-    '/auth/register',
-    view_func=registration_view,
+users_blueprint.add_url_rule(
+    '/users/index',
+    view_func=users_view,
     methods=['POST', 'GET']
 )
